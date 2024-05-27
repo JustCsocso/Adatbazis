@@ -127,6 +127,60 @@ VALUES("1","9.H","gimnázium","földrajz ","Vránicsné Bődi Ildikó ","","2023
 ("4","9.B","oktatás","Történelem","Török Bálint","","2023.11.29."),
 ("4","12.C","informatika és távközlés","IKT Projektmunka,","Mészáros róbert","Madarász Péter","2023.11.29.");
 
-SELECT * FROM eredeti;
 
-SELECT DISTINCT TRIM(tantargy) FROM eredeti;
+UPDATE eredeti SET tantargy=TRIM(tantargy);
+UPDATE eredeti SET tantargy="angol nyelv" WHERE tantargy="angol";
+UPDATE eredeti SET tantargy="német nyelv" WHERE tantargy="német";
+UPDATE eredeti SET tantargy="IKT projektmunka" WHERE tantargy="IKT Projektmunka,";
+
+INSERT INTO tantargy (nev)
+	SELECT DISTINCT tantargy 
+		FROM eredeti 
+		ORDER BY tantargy;
+		
+ALTER TABLE eredeti ADD tantargyid int; 
+
+SELECT tantargy.id FROM tantargy, eredeti WHERE nev = tantargy;
+
+/*UPDATE eredeti 
+	SET tantargyid = (SELECT tantargy.id FROM tantargy, eredeti WHERE nev = tantargy)
+	WHERE tantargy = (SELECT tantargy.id FROM tantargy, eredeti WHERE nev = tantargy LIMIT 1);*/
+
+UPDATE eredeti, tantargy
+	SET tantargyid = tantargy.id
+	WHERE tantargy = nev;
+
+SELECT tantargy, nev 
+	FROM tantargy, eredeti 
+	WHERE tantargy.id = tantargyid;
+	
+	
+INSERT INTO oktato (nev)
+	SELECT DISTINCT oktato 
+		FROM eredeti 
+		ORDER BY oktato;
+		
+ALTER TABLE eredeti ADD oktatoid int; 
+
+UPDATE eredeti, oktato
+	SET oktatoid = oktato.id
+	WHERE oktato = nev;
+
+INSERT INTO agazat (nev)
+	SELECT DISTINCT agazat 
+		FROM eredeti 
+		ORDER BY agazat;
+		
+ALTER TABLE eredeti ADD agazatid int; 
+
+UPDATE eredeti, agazat
+	SET agazatid = agazat.id
+	WHERE agazat = nev;
+
+INSERT INTO oktato2tantargy (oktatoid,tantargyid)
+	SELECT DISTINCT oktatoid,tantargyid 
+		FROM eredeti;
+		
+INSERT INTO oktato2tantargy (osztalyid,agazatid)
+	SELECT DISTINCT osztalyid,agazatid 
+		FROM eredeti;
